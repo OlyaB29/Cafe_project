@@ -1,5 +1,9 @@
+import os
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+
+from .transliteration import transliteration
 
 
 class Meal(models.Model):
@@ -34,3 +38,27 @@ class MealClick(models.Model):
     click_date = models.DateTimeField('Дата клика')
     user=models.ForeignKey(User, on_delete=models.DO_NOTHING)
 
+def get_path_upload_image(file, meal):
+    end_extention = file.split('.')[1]
+    head = file.split('.')[0]
+    if len(head) > 10:
+        head = head[:10]
+    file_name = head + '.' + end_extention
+    return os.path.join('{}', '{}').format(meal, file_name)
+
+class Photo(models.Model):
+    meal = models.ForeignKey(Meal, verbose_name="Блюдо", related_name='photos', on_delete=models.CASCADE)
+    image = models.ImageField("Фото", upload_to="meals/")
+
+    def __str__(self):
+        return '{}'.format(self.image.name)[15:]
+
+    def save(self, *args, **kwargs):
+        trans_meal = transliteration(self.meal)
+        self.image.name = get_path_upload_image(self.image.name, trans_meal)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Фотография"
+        verbose_name_plural = "Фотографии"
+        ordering = ('id',)

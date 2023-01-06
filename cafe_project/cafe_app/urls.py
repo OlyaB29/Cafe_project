@@ -1,8 +1,20 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from . import views, api
+from rest_framework import routers
+from .api import MealViewSet, MenuViewSet
 
 
 app_name = 'cafe_app'
+
+router = routers.DefaultRouter()
+router.register('menu', api.MenuViewSet, 'meal_categories')
+router.register('meals/(?P<meal_category>[^/.]+)', api.MealViewSet, 'meals')
+router.register('statistics_meals', api.TopMealViewSet, 'meals')
+router.register('statistics_users', api.TopUserViewSet, 'users')
+router.register('statistics_users_category/(?P<meal_category>[^/.]+)', api.TopUserCategoryViewSet, 'users')
+router.register('statistics_chart/(?P<meal_id>[^/.]+)', api.MealStatisticsViewSet, 'clicks')
+
+
 urlpatterns = [
     path('', views.menu, name='menu'),
     path('menu', views.menu, name='menu'),
@@ -11,5 +23,7 @@ urlpatterns = [
     path('meal_statistics/<int:meal_id>', views.meal_statistics, name='meal_statistics'),
     path('<meal_category>', views.meal_category, name='meal_category'),
     path('<int:meal_id>/meal', views.meal, name='meal'),
-
+    path('api/', include(router.urls)),
 ]
+
+# urlpatterns += router.urls

@@ -70,6 +70,10 @@ def meal_statistics(request, meal_id):
     qsstats = QuerySetStats(clicks, date_field='click_date', aggregate=Count('id'))
     stat_values = qsstats.time_series(start_date, end_date, interval=interval)
 
+    print(qsstats)
+    print(stat_values)
+
     return render(request, 'cafe_app/meal_statistics.html',
                   {'meal': meal, 'stat_values': stat_values, 'period_select': period_data.keys(),
                    'date_format': date_format})
+
