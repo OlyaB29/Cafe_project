@@ -12,7 +12,8 @@ class MenuViewSet(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):
-        meal_categories = list(filter(lambda el: 'NO_TYPE' not in el[0], Meal.MealType.choices))
+        types = [[Meal.MealType.choices[i][0], Meal.MealType.names[i]] for i in range(len(Meal.MealType.choices))]
+        meal_categories = list(filter(lambda el: 'NO_TYPE' not in el[0], types))
         return Response(meal_categories)
 
 
@@ -21,6 +22,9 @@ class MealViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            # queryset just for schema generation metadata
+            return Meal.objects.none()
         index = Meal.MealType.names.index(self.kwargs['meal_category'])
         return Meal.objects.filter(meal_type=Meal.MealType.values[index])
 
@@ -42,6 +46,9 @@ class TopUserCategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            # queryset just for schema generation metadata
+            return User.objects.none()
         index = Meal.MealType.names.index(self.kwargs['meal_category'])
         clicks = MealClick.objects.filter(meal__meal_type=Meal.MealType.values[index], user=OuterRef("pk"))
         clicks_v = clicks.values('user')
@@ -55,7 +62,6 @@ class TopUserCategoryViewSet(viewsets.ModelViewSet):
             top_users = User.objects.filter(mealclick__in=clicks).distinct().annotate(
                 user_click_count=Subquery(click_count)).order_by(
                 '-user_click_count')
-
         return top_users
 
 
@@ -83,9 +89,11 @@ class MealStatisticsViewSet(viewsets.ViewSet):
         start_date = end_date - delta
 
         if interval == "hours":
-            date_format = "M j G:i"
+            date_format = '%d.%m %H:%M'
+        elif interval == "months":
+            date_format = '%m.%Y'
         else:
-            date_format = "M j"
+            date_format = '%d.%m'
 
         qsstats = QuerySetStats(clicks, date_field='click_date', aggregate=Count('id'))
         stat_values = qsstats.time_series(start_date, end_date, interval=interval)
@@ -93,6 +101,6 @@ class MealStatisticsViewSet(viewsets.ViewSet):
         stat_data = []
 
         for key, value in stat_values:
-            stat_data.append({'date':key, 'click_count':value})
+            stat_data.append({'date': key.strftime(date_format), 'click_count': value})
 
         return Response(stat_data)

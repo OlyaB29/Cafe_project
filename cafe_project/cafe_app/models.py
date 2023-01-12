@@ -31,6 +31,7 @@ class Meal(models.Model):
     class Meta:
         verbose_name="Блюдо"
         verbose_name_plural="Блюда"
+        ordering = ('meal_type', 'name')
 
 
 class MealClick(models.Model):

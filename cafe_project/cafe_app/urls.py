@@ -1,7 +1,6 @@
 from django.urls import path, include
 from . import views, api
 from rest_framework import routers
-from .api import MealViewSet, MenuViewSet
 
 
 app_name = 'cafe_app'
