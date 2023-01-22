@@ -11,34 +11,74 @@ export default class CafeService {
     }
 
     getMealCategory(category) {
-        const url = `${API_URL}/cafe_app/api/meals/${category}`;
+        const url = `${API_URL}/cafe_app/api/${category}`;
         return axios.get(url).then(response => response.data);
     }
 
-    getMeal(category,pk) {
-        const url = `${API_URL}/cafe_app/api/meals/${category}/${pk}`;
+    getMealInCategory(category, pk, access) {
+        const url = `${API_URL}/cafe_app/api/${category}/${pk}`;
+        return access
+            ? axios.get(url, {headers: {"Authorization": `JWT ${access}`}}).then(response => response.data).catch(
+                (error) => this.errorHandler(error))
+            : axios.get(url).then(response => response.data);
+    }
+
+    getMeal(pk) {
+        const url = `${API_URL}/cafe_app/api/meals/${pk}`;
         return axios.get(url).then(response => response.data);
     }
 
-    getTopMeals() {
+    getTopMeals(access) {
         const url = `${API_URL}/cafe_app/api/statistics_meals`;
-        return axios.get(url).then(response => response.data);
+        return axios.get(url, {headers: {"Authorization": `JWT ${access}`}}).then(response => response.data).catch((error) => this.errorHandler(error));
     }
 
-     getTopUsers() {
+    getTopUsers(access) {
         const url = `${API_URL}/cafe_app/api/statistics_users`;
-        return axios.get(url).then(response => response.data);
+        return axios.get(url, {headers: {"Authorization": `JWT ${access}`}}).then(response => response.data).catch((error) => this.errorHandler(error));
     }
 
-    getCategoryTopUsers(category) {
+    getCategoryTopUsers(category, access) {
         const url = `${API_URL}/cafe_app/api/statistics_users_category/${category}`;
-        return axios.get(url).then(response => response.data);
+        return axios.get(url, {headers: {"Authorization": `JWT ${access}`}}).then(response => response.data).catch((error) => this.errorHandler(error));
     }
 
-    getMealData(pk) {
-        const url = `${API_URL}/cafe_app/api/statistics_chart/${pk}`;
-        return axios.get(url).then(response => response.data);
+    getMealData(pk, period, num, access) {
+        const url = period ? `${API_URL}/cafe_app/api/statistics_chart/${pk}/?period=${period}&num=${num}`
+            : `${API_URL}/cafe_app/api/statistics_chart/${pk}`
+        return axios.get(url, {headers: {"Authorization": `JWT ${access}`}}).then(response => response.data).catch((error) => this.errorHandler(error));
     }
+
+    getTokens(username, password) {
+        const url = `${API_URL}/auth/jwt/create`;
+        return axios.post(url, {username: username, password: password}).then(response => response.data);
+    }
+
+    getRefresh(refresh) {
+        const url = `${API_URL}/auth/jwt/refresh`;
+        return axios.post(url, {refresh: refresh}).then(response => response.data);
+    }
+
+    createUser(user) {
+    	const url = `${API_URL}/auth/users/`;
+    	return axios.post(url, user);
+    }
+
+    errorHandler(err) {
+        return (
+            err.response.data.detail === "Given token not valid for any token type"
+                ? this.getRefresh(localStorage.getItem('refreshToken')).then((r) => r).catch(
+                    (error) => error.response.data.detail === "Token is invalid or expired"
+                        ? localStorage.removeItem('user')
+                        : alert("Произошла ошибка"))
+                : alert(err))
+    }
+
+    getUser(access) {
+        const url = `${API_URL}/auth/users/me`;
+        return axios.get(url, {headers: {"Authorization": `JWT ${access}`}}).then(response => response.data).catch((error) => this.errorHandler(error));
+    }
+
     //
     // getCategories() {
     // 	const url = `${API_URL}/api/categories/`;

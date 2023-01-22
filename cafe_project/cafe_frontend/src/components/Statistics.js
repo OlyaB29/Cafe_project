@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import CafeService from './CafeService';
+import {useLocation, useNavigate} from "react-router-dom";
 
 const cafeService = new CafeService();
 
@@ -8,15 +9,41 @@ export default function Statistics() {
 
     const [topMeals, setTopMeals] = useState([]);
     const [topUsers, setTopUsers] = useState([]);
+    const [access, setAccess] = useState(localStorage.getItem('accessToken'));
+    const navigate = useNavigate();
+    const location = useLocation();
 
 
     useEffect(() => {
-        cafeService.getMealData().then(function (result) {
+        cafeService.getTopMeals(access).then(function (result) {
             console.log(result);
-            setData(result);
+            if (result) {
+                if (result.access) {
+                    localStorage.setItem('accessToken', result.access);
+                    setAccess(result.access);
+                    localStorage.setItem('refreshToken', result.refresh);
+                } else {
+                    setTopMeals(result.slice(0, 3));
+                }
+            } else {
+                navigate('/login', {replace: true, state: {from: location}});
+            }
         });
-
-    }, []);
+        cafeService.getTopUsers(access).then(function (result) {
+            console.log(result);
+            if (result) {
+                if (result.access) {
+                    localStorage.setItem('accessToken', result.access);
+                    setAccess(result.access);
+                    localStorage.setItem('refreshToken', result.refresh);
+                } else {
+                    setTopUsers(result.slice(0, 10));
+                }
+            } else {
+                navigate('/login', {replace: true, state: {from: location}});
+            }
+        });
+    }, [access]);
 
 
     return (
@@ -33,7 +60,7 @@ export default function Statistics() {
                     </thead>
                     <tbody>
                     {topMeals.map((meal, index) =>
-                        <tr>
+                        <tr key={meal.id}>
                             <td className='ind'>{index + 1}</td>
                             <td className='value'>{meal.name}</td>
                             <td className='value' style={{textAlign: "center"}}>{meal.click_count}</td>
@@ -53,7 +80,7 @@ export default function Statistics() {
                     </thead>
                     <tbody>
                     {topUsers.map((user, index) =>
-                        <tr>
+                        <tr key={user.id}>
                             <td className='ind'>{index + 1}</td>
                             <td className='value'>{user.username}</td>
                             <td className='value' style={{textAlign: "center"}}>{user.user_click_count}</td>
@@ -62,5 +89,5 @@ export default function Statistics() {
                 </table>
             </div>
         </div>
-);
+    );
 }

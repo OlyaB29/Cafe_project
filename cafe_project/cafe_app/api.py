@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.models import User
 from django.db.models import Count, OuterRef, Subquery
 from django.utils import timezone
@@ -17,7 +19,7 @@ class MenuViewSet(viewsets.ViewSet):
         return Response(meal_categories)
 
 
-class MealViewSet(viewsets.ModelViewSet):
+class MealCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = MealSerializer
     permission_classes = [permissions.AllowAny]
 
@@ -26,24 +28,38 @@ class MealViewSet(viewsets.ModelViewSet):
             # queryset just for schema generation metadata
             return Meal.objects.none()
         index = Meal.MealType.names.index(self.kwargs['meal_category'])
-        return Meal.objects.filter(meal_type=Meal.MealType.values[index])
+        queryset=Meal.objects.filter(meal_type=Meal.MealType.values[index])
+
+        if self.action == 'retrieve':
+            meal = queryset.get(id=self.kwargs['pk'])
+            if self.request.user.id:
+                meal.mealclick_set.create(click_date=timezone.now(), user=self.request.user)
+            else:
+                meal.mealclick_set.create(click_date=timezone.now())
+
+        return queryset
+
+class MealViewSet(viewsets.ModelViewSet):
+    serializer_class = MealSerializer
+    permission_classes = [permissions.AllowAny]
+    queryset = Meal.objects.all()
 
 
 class TopMealViewSet(viewsets.ModelViewSet):
     serializer_class = TopMealSerializer
-    permission_classes = [permissions.AllowAny]
-    queryset = Meal.objects.annotate(click_count=Count('mealclick')).order_by('-click_count')[:3]
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Meal.objects.annotate(click_count=Count('mealclick')).order_by('-click_count')
 
 
 class TopUserViewSet(viewsets.ModelViewSet):
     serializer_class = TopUserSerializer
-    permission_classes = [permissions.AllowAny]
-    queryset = User.objects.annotate(user_click_count=Count('mealclick')).order_by('-user_click_count')
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = User.objects.exclude(id=13).annotate(user_click_count=Count('mealclick')).order_by('-user_click_count')
 
 
 class TopUserCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = TopUserSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
@@ -53,15 +69,8 @@ class TopUserCategoryViewSet(viewsets.ModelViewSet):
         clicks = MealClick.objects.filter(meal__meal_type=Meal.MealType.values[index], user=OuterRef("pk"))
         clicks_v = clicks.values('user')
         click_count = clicks_v.annotate(c=Count('*')).values('c')
-
-        if self.request.GET.get('user_count'):
-            top_users = User.objects.filter(mealclick__in=clicks).distinct().annotate(
-                user_click_count=Subquery(click_count)).order_by(
-                '-user_click_count')[:int(self.request.GET.get('user_count'))]
-        else:
-            top_users = User.objects.filter(mealclick__in=clicks).distinct().annotate(
-                user_click_count=Subquery(click_count)).order_by(
-                '-user_click_count')
+        top_users = User.objects.exclude(id=13).filter(mealclick__in=clicks).distinct().annotate(
+            user_click_count=Subquery(click_count)).order_by('-user_click_count')
         return top_users
 
 
@@ -75,7 +84,7 @@ class MealStatisticsViewSet(viewsets.ViewSet):
         if request.GET.get('num'):
             num = int(request.GET.get('num'))
         end_date = timezone.now()
-
+        print(timezone.now())
         delta = timezone.timedelta(days=num)
 
         period_data = {"Часы": ("hours", timezone.timedelta(hours=num)),

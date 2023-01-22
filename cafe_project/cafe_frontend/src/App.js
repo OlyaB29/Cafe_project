@@ -7,7 +7,10 @@ import MealDetail from "./components/MealDetail";
 import Statistics from "./components/Statistics";
 import CategoryStatistics from "./components/CategoryStatistics";
 import MealChart from "./components/MealChart";
-
+import {Login} from "./components/Login";
+import {RequireAuth} from "./hogs/RequireAuth";
+import {AuthProvider} from "./hogs/AuthProvider";
+import Registration from "./components/Registration";
 
 
 function BaseLayout() {
@@ -15,51 +18,25 @@ function BaseLayout() {
     return (
         <div className="wrapper">
             <Top/>
-            {/*<header>*/}
-            {/*    <div className='presentation'></div>*/}
-            {/*</header>*/}
             <div className="content">
                 <Routes>
                     <Route path='/' element={<Menu/>}/>
-                    <Route path='/meals/:meal_category' element={<Category/>}/>
-                    <Route path='/meals/:meal_category/:id' element={<MealDetail/>}/>
-                    <Route path='/statistics' element={<Statistics/>}/>
-                    <Route path='/category_statistics' element={<CategoryStatistics/>}/>
-                    <Route path='/meal_statistics/:id' element={<MealChart/>}/>
-                    {/*<Route path='/adverts/seller/:id' element={<SellerAdverts/>}/>*/}
-                    {/*<Route path='category/:slug' element={<CategoryAdvertList/>}/>*/}
-                    {/*<Route path='search' element={<SearchAdverts/>}/>*/}
-                    {/*<Route path='registration' element={<Registration/>}/>*/}
-                    {/*<Route path='tokens' element={<Tokens/>}/>*/}
-                    {/*<Route path='advert-create' element={*/}
-                    {/*    <RequireAuth>*/}
-                    {/*        <AdvertCreateUpdate/>*/}
-                    {/*    </RequireAuth>}/>*/}
-                    {/*<Route path='advert-update/:id' element={*/}
-                    {/*    <RequireAuth>*/}
-                    {/*        <AdvertCreateUpdate/>*/}
-                    {/*    </RequireAuth>}/>*/}
-                    {/*<Route path='login' element={<LoginPage/>}/>*/}
-                    {/*<Route path='profile-update/:id' element={*/}
-                    {/*    <RequireAuth>*/}
-                    {/*        <ProfileUpdate/>*/}
-                    {/*    </RequireAuth>}/>*/}
-                    {/*<Route path='profile/:id' element={*/}
-                    {/*    <RequireAuth>*/}
-                    {/*        <UserProfile/>*/}
-                    {/*    </RequireAuth>}/>*/}
-                    {/*<Route path='profile/adverts' element={*/}
-                    {/*    <RequireAuth>*/}
-                    {/*        <UserAdverts/>*/}
-                    {/*    </RequireAuth>}/>*/}
-                    {/*<Route path='messages' element={*/}
-                    {/*    <RequireAuth>*/}
-                    {/*        <Messages/>*/}
-                    {/*    </RequireAuth>}/>*/}
-                    {/*<Route path='/mess-to-seller/:id' element={*/}
-                    {/*    <RequireAuth>*/}
-                    {/*        <MessToSeller/>*/}
-                    {/*    </RequireAuth>}/>*/}
+                    <Route path='/:meal_category' element={<Category/>}/>
+                    <Route path='/:meal_category/:id' element={<MealDetail/>}/>
+                    <Route path='login' element={<Login/>}/>
+                    <Route path='registration' element={<Registration/>}/>
+                    <Route path='/statistics' element={
+                        <RequireAuth>
+                            <Statistics/>
+                        </RequireAuth>}/>
+                    <Route path='/category_statistics' element={
+                        <RequireAuth>
+                            <CategoryStatistics/>
+                        </RequireAuth>}/>
+                    <Route path='/meal_statistics/:id' element={
+                        <RequireAuth>
+                            <MealChart/>
+                        </RequireAuth>}/>
                 </Routes>
             </div>
             <footer>
@@ -71,9 +48,11 @@ function BaseLayout() {
 
 function App() {
     return (
-        <BrowserRouter>
-            <BaseLayout/>
-        </BrowserRouter>
+        <AuthProvider>
+            <BrowserRouter>
+                <BaseLayout/>
+            </BrowserRouter>
+        </AuthProvider>
     );
 }
 

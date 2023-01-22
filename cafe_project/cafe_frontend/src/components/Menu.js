@@ -24,7 +24,7 @@ export default function Menu() {
             <h3>Приветствуем Вас в нашем кафе.<br/> Знакомьтесь с меню, выбирайте и наслаждайтесь вкусом</h3>
             <div className='menu'>
                 {mealCategories.map((category, index) =>
-                    <Link className='menu-link' key={index} state={category[0]} to={`/meals/${category[1]}`}>{category[0]}</Link>)
+                    <Link className='menu-link' key={index} state={category[0]} to={`/${category[1]}`}>{category[0]}</Link>)
                     // <a className='menu-link' key={index} href={`/meals/${category[1]}`} onClick=>
                     //     {category[0]}
                     // </a>)

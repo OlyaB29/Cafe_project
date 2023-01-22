@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import CafeService from './CafeService';
-import {useNavigate, useSearchParams} from "react-router-dom";
+import {useLocation, useNavigate, useSearchParams} from "react-router-dom";
 
 const cafeService = new CafeService();
 
@@ -12,8 +12,10 @@ export default function CategoryStatistics() {
     const [categoryTopUsers, setCategoryTopUsers] = useState([]);
     const [category, setCategory] = useState('unknown');
     const [meals, setMeals] = useState([]);
+    const [access, setAccess] = useState(localStorage.getItem('accessToken'));
     const [isUnknown, setIsUnknown] = useState(true);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const location = useLocation();
 
 
     useEffect(() => {
@@ -26,22 +28,38 @@ export default function CategoryStatistics() {
 
     useEffect(() => {
         if (searchParams.get("meal_category")) {
-            cafeService.getCategoryTopUsers(searchParams.get("meal_category")).then(function (result) {
-                console.log(result);
-                searchParams.get("user_count") ? setCategoryTopUsers(result.slice(0, searchParams.get("user_count")))
-                    : setCategoryTopUsers(result);
-                mealCategories.map((category) => {
-                    category[1] === searchParams.get("meal_category") && setCategory(category[0]);
-                    console.log(category[0]);
-                    console.log(category[1])
-                });
+            mealCategories.map((category) => {
+                category[1] === searchParams.get("meal_category") && setCategory(category[0]);
+                console.log(category[0]);
+                console.log(category[1])
             });
             cafeService.getMealCategory(searchParams.get("meal_category")).then(function (result) {
                 console.log(result);
                 setMeals(result);
-            })
+            });
         }
     }, [searchParams, mealCategories]);
+
+
+    useEffect(() => {
+        if (searchParams.get("meal_category")) {
+            cafeService.getCategoryTopUsers(searchParams.get("meal_category"), access).then(function (result) {
+                console.log(result);
+                if (result) {
+                    if (result.access) {
+                        localStorage.setItem('accessToken', result.access);
+                        setAccess(result.access);
+                        localStorage.setItem('refreshToken', result.refresh);
+                    } else {
+                        searchParams.get("user_count") ? setCategoryTopUsers(result.slice(0, searchParams.get("user_count")))
+                            : setCategoryTopUsers(result);
+                    }
+                } else {
+                    navigate('/login', {replace: true, state: {from: location}});
+                }
+            })
+        }
+    }, [searchParams, access]);
 
 
     const onChange = (e) => {
@@ -102,9 +120,8 @@ export default function CategoryStatistics() {
                                 <h4>Ссылки на графики по блюдам категории</h4>
                                 <div className='charts-links'>
                                     {meals.map((meal) =>
-
-                                        <button className='btn' key={meal.id} onClick={() => navigate(`/meal_statistics/${meal.id}`, {state: { meal_name: meal.name }})}>{meal.name}</button>)}
-
+                                        <button className='btn' key={meal.id}
+                                                onClick={() => navigate(`/meal_statistics/${meal.id}`)}>{meal.name}</button>)}
                                 </div>
                             </div>
                         </div>

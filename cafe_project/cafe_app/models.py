@@ -37,7 +37,7 @@ class Meal(models.Model):
 class MealClick(models.Model):
     meal = models.ForeignKey(Meal, on_delete=models.DO_NOTHING)
     click_date = models.DateTimeField('Дата клика')
-    user=models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    user=models.ForeignKey(User, default=13, on_delete=models.DO_NOTHING)
 
 def get_path_upload_image(file, meal):
     end_extention = file.split('.')[1]

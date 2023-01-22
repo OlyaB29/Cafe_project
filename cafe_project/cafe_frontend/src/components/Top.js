@@ -4,27 +4,15 @@ import {FaSearch, FaUserAlt} from "react-icons/fa";
 
 
 import CafeService from "./CafeService";
+import {useAuth} from "../hook/useAuth";
 
 const cafeService = new CafeService();
 
 export default function Top() {
 
     const user = localStorage.getItem('user')
-    // const {signOut} = useAuth();
-    // const navigate = useNavigate();
-    // const location = useLocation();
-    // const [access, setAccess] = useState();
-    // const [newMessCount, setNewMessCount] = useState();
-    // const [isUpdate, setIsUpdate] = useState(false);
-    // console.log(localStorage.getItem('user'));
-    // const [categories, setCategories] = useState([]);
-
-    // useEffect(() => {
-    //     advertBoardService.getCategories().then(function (result) {
-    //         console.log(result.data);
-    //         setCategories(result.data)
-    //     });
-    // }, []);
+    const {signOut} = useAuth();
+    const navigate = useNavigate();
 
 
     return (
@@ -54,16 +42,16 @@ export default function Top() {
                                    href=""><FaUserAlt className='user-icon'/> {user}</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link active" href='#'
+                                <a className="nav-link active" href='#' onClick={() => signOut(() => navigate('/', {replace: true}))}
                                 >Выйти</a>
                             </li>
                         </div>
                         : <div className='options'>
                             <li className="nav-item">
-                                <a className="nav-link active" href="">Регистрация</a>
+                                <a className="nav-link active" href="/registration">Регистрация</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link active" href="">Войти</a>
+                                <a className="nav-link active" href="/login">Войти</a>
                             </li>
                         </div>
                     }

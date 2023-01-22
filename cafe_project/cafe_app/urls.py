@@ -7,11 +7,12 @@ app_name = 'cafe_app'
 
 router = routers.DefaultRouter()
 router.register('menu', api.MenuViewSet, 'meal_categories')
-router.register('meals/(?P<meal_category>[^/.]+)', api.MealViewSet, 'meals')
+router.register('meals', api.MealViewSet, 'meals')
 router.register('statistics_meals', api.TopMealViewSet, 'meals')
 router.register('statistics_users', api.TopUserViewSet, 'users')
 router.register('statistics_users_category/(?P<meal_category>[^/.]+)', api.TopUserCategoryViewSet, 'users')
 router.register('statistics_chart/(?P<meal_id>[^/.]+)', api.MealStatisticsViewSet, 'clicks')
+router.register('(?P<meal_category>[^/.]+)', api.MealCategoryViewSet, 'meals')
 
 
 urlpatterns = [

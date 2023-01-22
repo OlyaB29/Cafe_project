@@ -10,18 +10,28 @@ function MealDetail() {
 
     const [meal, setMeal] = useState({});
     const {id, meal_category} = useParams();
-    // const navigate = useNavigate()
-    // const location = useLocation();
+    const [access, setAccess] = useState(localStorage.getItem('accessToken'));
+    const navigate = useNavigate();
+    const location = useLocation();
 
 
 
     useEffect(() => {
-        cafeService.getMeal(meal_category, Number(id)).then(function (result) {
+        cafeService.getMealInCategory(meal_category, id, access).then(function (result) {
             console.log(result);
-            setMeal(result);
+            if (result) {
+                if (result.access) {
+                    localStorage.setItem('accessToken', result.access);
+                    setAccess(result.access);
+                    localStorage.setItem('refreshToken', result.refresh);
+                } else {
+                    setMeal(result);
+                }
+            } else {
+                navigate('/login', {replace: true, state: {from: location}});
+            }
         })
-    }, [id]);
-
+    }, [id, access]);
 
 
     return (
@@ -53,6 +63,7 @@ function MealDetail() {
 
                         <h5>Описание:</h5>
                         <p>{meal.description}</p>
+                        <a className='stat-link' href={`/meal_statistics/${meal.id}`}>Статистика</a>
                     </div>
                 </div>
             </div>
