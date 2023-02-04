@@ -28,6 +28,11 @@ export default class CafeService {
         return await axios.get(url).then(response => response.data);
     }
 
+    async getMeals() {
+        const url = `${API_URL}/cafe_app/api/meals`;
+        return await axios.get(url).then(response => response.data);
+    }
+
     async getTopMeals(access) {
         const url = `${API_URL}/cafe_app/api/statistics_meals`;
         return await axios.get(url, {headers: {"Authorization": `JWT ${access}`}}).then(response => response.data).catch((error) => this.errorHandler(error));
@@ -79,6 +84,15 @@ export default class CafeService {
         return await axios.get(url, {headers: {"Authorization": `JWT ${access}`}}).then(response => response.data).catch((error) => this.errorHandler(error));
     }
 
+    async createMeal(meal, access) {
+        const url = `${API_URL}/cafe_app/api/meals/`;
+        return await axios.post(url, meal, { headers: {"Authorization" : `JWT ${access}`}}).then(response => "ok").catch((error)=>{this.errorHandler(error); console.log(error)});
+    }
+
+    createPhoto(photo, access) {
+		const url = `${API_URL}/cafe_app/api/photos/`;
+		return axios.post(url, photo, { headers: {"Authorization" : `JWT ${access}`}});
+	}
 
 }
 

@@ -8,23 +8,30 @@ class PhotoSerializer(serializers.ModelSerializer):
         model = Photo
         fields = "__all__"
 
-class MealSerializer(serializers.ModelSerializer):
 
+class MealSerializer(serializers.ModelSerializer):
     photos = PhotoSerializer(many=True)
+
     class Meta:
         model = Meal
         fields = '__all__'
 
-class TopMealSerializer(serializers.ModelSerializer):
 
+class MealCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Meal
+        fields = '__all__'
+
+
+class TopMealSerializer(serializers.ModelSerializer):
     click_count = serializers.IntegerField()
 
     class Meta:
         model = Meal
         fields = ('id', 'name', 'click_count')
 
-class TopUserSerializer(serializers.ModelSerializer):
 
+class TopUserSerializer(serializers.ModelSerializer):
     user_click_count = serializers.IntegerField()
 
     class Meta:

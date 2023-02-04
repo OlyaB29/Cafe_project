@@ -8,6 +8,7 @@ app_name = 'cafe_app'
 router = routers.DefaultRouter()
 router.register('menu', api.MenuViewSet, 'meal_categories')
 router.register('meals', api.MealViewSet, 'meals')
+router.register('photos', api.PhotoViewSet, 'photos')
 router.register('statistics_meals', api.TopMealViewSet, 'meals')
 router.register('statistics_users', api.TopUserViewSet, 'users')
 router.register('statistics_users_category/(?P<meal_category>[^/.]+)', api.TopUserCategoryViewSet, 'users')

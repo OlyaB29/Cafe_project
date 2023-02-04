@@ -20,7 +20,6 @@ export default function CategoryStatistics() {
 
     useEffect(() => {
         cafeService.getMenu().then(function (result) {
-            console.log(result);
             setMealCategories(result);
         })
     }, []);

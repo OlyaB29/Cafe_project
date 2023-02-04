@@ -25,7 +25,6 @@ const Login = () => {
                 console.log(res);
                 signIn(user, result.access, result.refresh, res.id, () =>
                     navigate(fromPage==='/registration' ? `/` : fromPage, {replace: true}))
-                console.log(res.id)
             })
         }).catch((error) => {error.response.data.detail==="No active account found with the given credentials" &&
         setError("Профиль с такими учетными данными не существует")})

@@ -5,9 +5,10 @@ from django.db.models import Count, OuterRef, Subquery
 from django.utils import timezone
 from qsstats import QuerySetStats
 from rest_framework.response import Response
-from .models import Meal, MealClick
+from .models import Meal, MealClick, Photo
 from rest_framework import viewsets, permissions
-from .serializers import MealSerializer, TopMealSerializer, TopUserSerializer
+from .serializers import MealSerializer, TopMealSerializer, TopUserSerializer, PhotoSerializer, MealCreateSerializer
+from .permissions import IsAdminOrReadOnly
 
 
 class MenuViewSet(viewsets.ViewSet):
@@ -17,7 +18,6 @@ class MenuViewSet(viewsets.ViewSet):
         types = [[Meal.MealType.choices[i][0], Meal.MealType.names[i]] for i in range(len(Meal.MealType.choices))]
         meal_categories = list(filter(lambda el: 'NO_TYPE' not in el[0], types))
         return Response(meal_categories)
-
 
 class MealCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = MealSerializer
@@ -39,10 +39,17 @@ class MealCategoryViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+
 class MealViewSet(viewsets.ModelViewSet):
-    serializer_class = MealSerializer
-    permission_classes = [permissions.AllowAny]
+
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Meal.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return MealCreateSerializer
+        else:
+            return MealSerializer
 
 
 class TopMealViewSet(viewsets.ModelViewSet):
@@ -113,3 +120,9 @@ class MealStatisticsViewSet(viewsets.ViewSet):
             stat_data.append({'date': key.strftime(date_format), 'click_count': value})
 
         return Response(stat_data)
+
+
+class PhotoViewSet(viewsets.ModelViewSet):
+    serializer_class = PhotoSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    queryset = Photo.objects.all()

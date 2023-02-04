@@ -25,7 +25,7 @@ export default function Category() {
                 {meals.map((meal) =>
                     <a className='meal-link' key={meal.id} href={`/${meal_category}/${meal.id}`}>
                     <div className="meal-photo">
-                        <img src={meal.photos[0].image} alt=""/>
+                        <img src={meal.photos.length ? meal.photos[0].image : "/img/No_photo.png"} alt=""/>
                         <p>{meal.name}</p>
                     </div>
                     </a>)

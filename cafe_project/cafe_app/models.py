@@ -35,7 +35,7 @@ class Meal(models.Model):
 
 
 class MealClick(models.Model):
-    meal = models.ForeignKey(Meal, on_delete=models.DO_NOTHING)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
     click_date = models.DateTimeField('Дата клика')
     user=models.ForeignKey(User, default=13, on_delete=models.DO_NOTHING)
 

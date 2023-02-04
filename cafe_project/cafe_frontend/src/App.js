@@ -11,6 +11,8 @@ import {Login} from "./components/Login";
 import {RequireAuth} from "./hogs/RequireAuth";
 import {AuthProvider} from "./hogs/AuthProvider";
 import Registration from "./components/Registration";
+import {useAuth} from "./hook/useAuth";
+import MealCreate from "./components/MealCreate";
 
 
 function BaseLayout() {
@@ -36,6 +38,10 @@ function BaseLayout() {
                     <Route path='/meal_statistics/:id' element={
                         <RequireAuth>
                             <MealChart/>
+                        </RequireAuth>}/>
+                    <Route path='/meal-create' element={
+                        <RequireAuth>
+                            <MealCreate/>
                         </RequireAuth>}/>
                 </Routes>
             </div>

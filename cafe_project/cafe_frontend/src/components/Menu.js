@@ -11,10 +11,9 @@ export default function Menu() {
 
     useEffect(() => {
         cafeService.getMenu().then(function (result) {
-            console.log(result);
             setMealCategories(result);
         })
-    },);
+    },[]);
 
     return (
         <div className='home'>

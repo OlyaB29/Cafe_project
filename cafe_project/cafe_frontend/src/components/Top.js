@@ -8,9 +8,10 @@ import {useAuth} from "../hook/useAuth";
 
 const cafeService = new CafeService();
 
-export default function Top() {
+export default function Top(props) {
 
-    const user = localStorage.getItem('user')
+    const user = localStorage.getItem('user');
+    const userId = Number(localStorage.getItem('userId'));
     const {signOut} = useAuth();
     const navigate = useNavigate();
 
@@ -35,6 +36,10 @@ export default function Top() {
                             </div>
                         </div>
                     </li>
+                    {userId && userId === 1 &&
+                        <li className="nav-item">
+                            <a className="nav-link active" aria-current="page" href="/meal-create">Добавить блюдо</a>
+                        </li>}
                     {user
                         ? <div className='options'>
                             <li className="nav-item-user">
@@ -42,7 +47,8 @@ export default function Top() {
                                    href=""><FaUserAlt className='user-icon'/> {user}</a>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link active" href='#' onClick={() => signOut(() => navigate('/', {replace: true}))}
+                                <a className="nav-link active" href='#'
+                                   onClick={() => signOut(() => navigate('/', {replace: true}))}
                                 >Выйти</a>
                             </li>
                         </div>
