@@ -3,7 +3,7 @@ from .models import Meal, Photo
 
 @admin.register(Meal)
 class MealAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'meal_type')
+    list_display = ('id', 'name', 'price', 'meal_type')
     list_filter = ('meal_type', )
     seach_fields = ('meal_type',)
 
