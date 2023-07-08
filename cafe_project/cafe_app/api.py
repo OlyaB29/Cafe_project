@@ -19,6 +19,7 @@ class MenuViewSet(viewsets.ViewSet):
         meal_categories = list(filter(lambda el: 'NO_TYPE' not in el[0], types))
         return Response(meal_categories)
 
+
 class MealCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = MealSerializer
     permission_classes = [permissions.AllowAny]

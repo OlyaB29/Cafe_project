@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000';
-
+const order_API_URL = 'http://localhost:8081/order';
 
 export default class CafeService {
 
@@ -93,6 +93,11 @@ export default class CafeService {
 		const url = `${API_URL}/cafe_app/api/photos/`;
 		return axios.post(url, photo, { headers: {"Authorization" : `JWT ${access}`}});
 	}
+
+    createOrder(order) {
+    	const url = `${order_API_URL}/create`;
+    	return axios.post(url, order);
+    }
 
 }
 

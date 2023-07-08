@@ -76,7 +76,7 @@ export default function Category() {
                                 <a href="#" onClick={sortAlpha}>По алфавиту</a>
                             </div>
                         </div>
-                        <h7>просмотрено {result} вариантов</h7>
+
                     </div>
                 </div>
             </div>
